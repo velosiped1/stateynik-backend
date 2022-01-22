@@ -2,9 +2,13 @@
     Main app
 '''
 
-from bottle import route, run, template, response, request
+from bottle import route, run, template, response, request, post
+import psycopg2 as psql
+import datetime
 
 _PREFIX = r'F:/Projects/stateynik-frontend/'
+# TODO: move to config
+_DB_CONNECTION = psql.connect("dbname=Stateynik user=Stateynik password=2202")
 
 
 @route("/")
@@ -29,6 +33,17 @@ def index(filename):
             return index_data
     except FileNotFoundError:
         return ""
+
+
+@post('/api/v1/publish')
+def insert_publication():
+    js = request.json()
+    now = datetime.datetime.now()
+    cur = _DB_CONNECTION.cursor()
+    cur.execute(''' INSERT INTO public."Publication"(
+	title, content, author_id, pubdate)
+	VALUES (''' + js["title"] + ',' + js["content"] + ',' + 1 + ',' + now  + ''');
+    ''')
 
 
 run(host='localhost', port=8080)
