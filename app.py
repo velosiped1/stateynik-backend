@@ -1,1 +1,3 @@
-print('Main app')
+'''
+    Main app
+'''
